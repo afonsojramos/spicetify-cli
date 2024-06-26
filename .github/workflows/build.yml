@@ -94,11 +94,13 @@ jobs:
       - name: Upload Artifact
         id: upload-artifact
         uses: actions/upload-artifact@v4
+        if: env.IS_UNIX == 'true' || env.IS_WIN == 'true'
         with:
           name: spicetify-${{ env.TAG }}-${{ matrix.os }}-${{ (matrix.os == 'windows' && matrix.arch == 'amd64' && 'x64') || (matrix.os == 'windows' && matrix.arch == '386' && 'x32') || matrix.arch }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
           path: spicetify-${{ env.TAG }}-${{ matrix.os }}-${{ (matrix.os == 'windows' && matrix.arch == 'amd64' && 'x64') || (matrix.os == 'windows' && matrix.arch == '386' && 'x32') || matrix.arch }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
 
       - uses: signpath/github-action-submit-signing-request@v0.4
+        if: env.IS_UNIX == 'true' || env.IS_WIN == 'true'
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ab28527e-02a2-4120-addc-63858f3acb54
