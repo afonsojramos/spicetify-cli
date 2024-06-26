@@ -110,7 +110,7 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: signed-artifacts
           parameters: |
-            Version: ${{ env.TAG }}
+            Version: ${{ toJSON(env.TAG) }}
 
       - name: Release
         if: env.IS_UNIX == 'true' || env.IS_WIN == 'true'
