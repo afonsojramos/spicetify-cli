@@ -91,6 +91,25 @@ jobs:
         with:
           args: 7z a -bb0 -mx9 "spicetify-${{ env.TAG }}-${{ matrix.os }}-${{ (matrix.arch == 'amd64' && 'x64') || (matrix.arch == 'arm64' && 'arm64') || 'x32' }}.zip" "./spicetify.exe" "./CustomApps" "./Extensions" "./Themes" "./jsHelper" "globals.d.ts" "css-map.json"
 
+      - name: Upload Artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spicetify-${{ env.TAG }}-${{ matrix.os }}-${{ (matrix.os == 'windows' && matrix.arch == 'amd64' && 'x64') || (matrix.os == 'windows' && matrix.arch == '386' && 'x32') || matrix.arch }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+          path: spicetify-${{ env.TAG }}-${{ matrix.os }}-${{ (matrix.os == 'windows' && matrix.arch == 'amd64' && 'x64') || (matrix.os == 'windows' && matrix.arch == '386' && 'x32') || matrix.arch }}.${{ matrix.os == 'windows' && 'zip' || 'tar.gz' }}
+
+      - uses: signpath/github-action-submit-signing-request@v0.4
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ab28527e-02a2-4120-addc-63858f3acb54
+          project-slug: cli
+          signing-policy-slug: test-signing
+          github-artifact-id: ${{steps.upload-artifact.outputs.artifact-id}}
+          wait-for-completion: true
+          output-artifact-directory: signed-artifacts
+          parameters: |
+            Version: ${{ env.TAG }}
+
       - name: Release
         if: env.IS_UNIX == 'true' || env.IS_WIN == 'true'
         uses: softprops/action-gh-release@v2
